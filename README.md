@@ -26,7 +26,7 @@ git clone git@github.com:Vladdikanov/transaction-service.git
 2. **Создание виртуального окружения**
 ```bash
 python -m venv venv
-venv/bin/activate
+venv/Scripts/activate
 ```
 3. **Установка зависимостей**
 ```bash

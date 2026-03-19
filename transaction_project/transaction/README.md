@@ -22,11 +22,12 @@
 1. **Клонирование репозитория**
 ```bash
 git clone git@github.com:Vladdikanov/transaction-service.git
+cd transaction_project
 ```
 2. **Создание виртуального окружения**
 ```bash
 python -m venv venv
-venv/bin/activate
+source venv/bin/activate
 ```
 3. **Установка зависимостей**
 ```bash
@@ -34,7 +35,6 @@ pip install -r requirements.txt
 ```
 4. **Создание миграций**
 ```bash
-cd transaction_project
 python manage.py makemigrations transaction
 ```
 5. **Применение миграций**
@@ -45,9 +45,7 @@ python manage.py migrate
 ```bash
 python manage.py createsuperuser
 ```
-
 7. **Запуск сервера**
 ```bash
 python manage.py runserver
 ```
-

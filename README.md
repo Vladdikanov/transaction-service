@@ -30,11 +30,11 @@ venv/Scripts/activate
 ```
 3. **Установка зависимостей**
 ```bash
+cd transaction_project
 pip install -r requirements.txt
 ```
 4. **Создание миграций**
 ```bash
-cd transaction_project
 python manage.py makemigrations transaction
 ```
 5. **Применение миграций**

@@ -1,0 +1,139 @@
+{% extends 'transaction/base.html' %}
+
+{% block title %}
+    {% if obj %}
+        Редактирование {{ verbose_name }}
+    {% else %}
+        Создание {{ verbose_name }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>
+                        {% if obj %}
+                            <i class="bi bi-pencil-square"></i> Редактирование: {{ obj.name }}
+                        {% else %}
+                            <i class="bi bi-plus-circle"></i> Создание {{ verbose_name }}
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Название</label>
+                            <input type="text" 
+                                   class="form-control {% if errors.name %}is-invalid{% endif %}" 
+                                   id="name" 
+                                   name="name" 
+                                   value="{{ obj.name|default:'' }}"
+                                   required>
+                            {% if errors.name %}
+                                <div class="invalid-feedback">
+                                    {{ errors.name }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+
+                        {% if model_type == 'category' %}
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Тип</label>
+                            <select class="form-control {% if errors.type %}is-invalid{% endif %}" 
+                                    id="type" 
+                                    name="type" 
+                                    required>
+                                <option value="">-- Выберите тип --</option>
+                                {% for type in types %}
+                                <option value="{{ type.id }}" 
+                                        {% if obj.type.id == type.id %}selected{% endif %}>
+                                    {{ type.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% if errors.type %}
+                                <div class="invalid-feedback">
+                                    {{ errors.type }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+
+                        {% if model_type == 'subcategory' %}
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Категория</label>
+                            <select class="form-control {% if errors.category %}is-invalid{% endif %}" 
+                                    id="category" 
+                                    name="category" 
+                                    required>
+                                <option value="">-- Выберите категорию --</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" 
+                                        data-type="{{ category.type.name }}"
+                                        {% if obj.category.id == category.id %}selected{% endif %}>
+                                    {{ category.name }} ({{ category.type.name }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% if errors.category %}
+                                <div class="invalid-feedback">
+                                    {{ errors.category }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Сохранить
+                            </button>
+                            <a href="{% url 'transaction:directory_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+
+            <div class="card mt-3">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-info-circle"></i> Подсказка
+                </div>
+                <div class="card-body">
+                    {% if model_type == 'status' %}
+                        <p class="mb-0">Статус определяет тип операции: Бизнес, Личное или Налог.</p>
+                    {% elif model_type == 'type' %}
+                        <p class="mb-0">Тип определяет направление движения средств: Пополнение или Списание.</p>
+                    {% elif model_type == 'category' %}
+                        <p class="mb-0">Категория привязана к типу. Например, "Маркетинг" может быть только у типа "Списание".</p>
+                    {% elif model_type == 'subcategory' %}
+                        <p class="mb-0">Подкатегория привязана к категории. Например, "Farpost" может быть только у категории "Маркетинг".</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelector('form').addEventListener('submit', function(e) {
+    const name = document.getElementById('name');
+    if (!name.value.trim()) {
+        e.preventDefault();
+        alert('Поле "Название" обязательно для заполнения');
+    }
+});
+</script>
+{% endblock %}

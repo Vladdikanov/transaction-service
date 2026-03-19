@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 
 class Type(models.Model):
@@ -63,7 +64,7 @@ class Subcategory(models.Model):
 
 
 class Transaction(models.Model):
-    date = models.DateTimeField('Дата создания записи', auto_now_add=True)
+    date = models.DateTimeField('Дата создания записи', default=timezone.now)
     status = models.ForeignKey(
         Status, 
         on_delete=models.PROTECT,

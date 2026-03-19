@@ -1,0 +1,152 @@
+{% extends 'transaction/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="bi bi-pencil-square"></i> {{ title }}</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" id="transactionForm">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.date.id_for_label }}" class="form-label">Дата *</label>
+                        {{ form.date }}
+                        {% if form.date.errors %}
+                            <div class="text-danger">{{ form.date.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">Статус *</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}
+                                <div class="text-danger">{{ form.status.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.type.id_for_label }}" class="form-label">Тип *</label>
+                            {{ form.type }}
+                            {% if form.type.errors %}
+                                <div class="text-danger">{{ form.type.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">Категория *</label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="text-danger">{{ form.category.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.subcategory.id_for_label }}" class="form-label">Подкатегория</label>
+                            {{ form.subcategory }}
+                            {% if form.subcategory.errors %}
+                                <div class="text-danger">{{ form.subcategory.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.amount.id_for_label }}" class="form-label">Сумма *</label>
+                            <div class="input-group">
+                                {{ form.amount }}
+                                <span class="input-group-text">₽</span>
+                            </div>
+                            {% if form.amount.errors %}
+                                <div class="text-danger">{{ form.amount.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.comment.id_for_label }}" class="form-label">Комментарий</label>
+                        {{ form.comment }}
+                        {% if form.comment.errors %}
+                            <div class="text-danger">{{ form.comment.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Сохранить
+                        </button>
+                        <a href="{% url 'transaction:transaction_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+
+    $('#id_type').change(function() {
+        var typeId = $(this).val();
+        if (typeId) {
+            $.ajax({
+                url: '{% url "transaction:get_categories" %}',
+                data: {
+                    'type_id': typeId
+                },
+                success: function(data) {
+                    var categorySelect = $('#id_category');
+                    categorySelect.empty();
+                    categorySelect.append('<option value="">---------</option>');
+                    $.each(data, function(index, category) {
+                        categorySelect.append('<option value="' + category.id + '">' + category.name + '</option>');
+                    });
+
+                    $('#id_subcategory').empty();
+                    $('#id_subcategory').append('<option value="">---------</option>');
+                }
+            });
+        } else {
+            $('#id_category').empty();
+            $('#id_category').append('<option value="">---------</option>');
+            $('#id_subcategory').empty();
+            $('#id_subcategory').append('<option value="">---------</option>');
+        }
+    });
+    
+    $('#id_category').change(function() {
+        var categoryId = $(this).val();
+        if (categoryId) {
+            $.ajax({
+                url: '{% url "transaction:get_subcategories" %}',
+                data: {
+                    'category_id': categoryId
+                },
+                success: function(data) {
+                    var subcategorySelect = $('#id_subcategory');
+                    subcategorySelect.empty();
+                    subcategorySelect.append('<option value="">---------</option>');
+                    $.each(data, function(index, subcategory) {
+                        subcategorySelect.append('<option value="' + subcategory.id + '">' + subcategory.name + '</option>');
+                    });
+                }
+            });
+        } else {
+            $('#id_subcategory').empty();
+            $('#id_subcategory').append('<option value="">---------</option>');
+        }
+    });
+});
+</script>
+{% endblock %}

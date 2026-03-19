@@ -1,0 +1,132 @@
+{% extends 'transaction/base.html' %}
+
+{% block title %}Список транзакций{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="bi bi-table"></i> Транзакции</h1>
+    <a href="{% url 'transaction:transaction_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Добавить транзакцию
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="bi bi-funnel"></i> Фильтры
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Дата с</label>
+                <input type="date" name="date_from" class="form-control" value="{{ filters.date_from }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Дата по</label>
+                <input type="date" name="date_to" class="form-control" value="{{ filters.date_to }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Статус</label>
+                <select name="status" class="form-select">
+                    <option value="">Все</option>
+                    {% for status in statuses %}
+                        <option value="{{ status.id }}" {% if filters.status == status.id|stringformat:"s" %}selected{% endif %}>
+                            {{ status.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Тип</label>
+                <select name="type" class="form-select">
+                    <option value="">Все</option>
+                    {% for type in types %}
+                        <option value="{{ type.id }}" {% if filters.type == type.id|stringformat:"s" %}selected{% endif %}>
+                            {{ type.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Категория</label>
+                <select name="category" class="form-select">
+                    <option value="">Все</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if filters.category == category.id|stringformat:"s" %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Подкатегория</label>
+                <select name="subcategory" class="form-select">
+                    <option value="">Все</option>
+                    {% for subcategory in subcategories %}
+                        <option value="{{ subcategory.id }}" {% if filters.subcategory == subcategory.id|stringformat:"s" %}selected{% endif %}>
+                            {{ subcategory.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Применить фильтры
+                </button>
+                <a href="{% url 'transaction:transaction_list' %}" class="btn btn-secondary">
+                    <i class="bi bi-eraser"></i> Сбросить
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Дата</th>
+                <th>Статус</th>
+                <th>Тип</th>
+                <th>Категория</th>
+                <th>Подкатегория</th>
+                <th>Сумма</th>
+                <th>Комментарий</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction.date|date:"d.m.Y" }}</td>
+                    <td>
+                        <span class="badge bg-info">{{ transaction.status.name }}</span>
+                    </td>
+                    <td>
+                        {% if transaction.type.name == "Пополнение" %}
+                            <span class="badge bg-success">{{ transaction.type.name }}</span>
+                        {% else %}
+                            <span class="badge bg-danger">{{ transaction.type.name }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ transaction.category.name }}</td>
+                    <td>{{ transaction.subcategory.name|default:"-" }}</td>
+                    <td class="fw-bold">{{ transaction.amount|floatformat:2 }} ₽</td>
+                    <td>{{ transaction.comment|truncatechars:30|default:"-" }}</td>
+                    <td>
+                        <a href="{% url 'transaction:transaction_edit' transaction.id %}" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'transaction:transaction_delete' transaction.id %}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center">Нет транзакций</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
